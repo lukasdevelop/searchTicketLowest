@@ -2,17 +2,23 @@ const csv = require('csv-parser');
 const path = require('path');
 const os = require('os');
 const fs = require('fs');
-const filename = path.join(__dirname, '../routes.csv');
+const filename = path.join(__dirname, './routesTeste.csv');
 
-module.exports = {
+describe('Routes', () => {
 
-    async store(req, res) {
+    it('should bring the route at the lowest price', () => {
 
         const results = []
 
-        const data = req.params;
+        const data = {
+            from: "GRU",
+            to: "SCL"
+        }
 
-        console.log('dados', data)
+        const expected = {
+            route: "GRU,SCL",
+            price: "3"
+        }
 
         fs.createReadStream(filename)
             .pipe(csv(['from', 'to', 'price']))
@@ -34,21 +40,22 @@ module.exports = {
                     price: lowestQuotes.price
                 }
 
-                return res.json(quote)
+                expect(expected).toBe(quote);
             })
+    })
+    
+   /* it('should register the news routes to file csv', () => {
 
-    },
-
-    async create(req, res) {
         const results = []
-
-        const { from, to, price } = req.body;
+        const row = [];
 
         const route = [{
-            from,
-            to,
-            price
+            from: "GRU",
+            to: "SCL",
+            price: 3
         }]
+
+        const expected = ["GRU,SCL,3"];
 
         fs.createReadStream(filename, 'utf8')
 
@@ -56,7 +63,6 @@ module.exports = {
             .on('end', () => {
 
                 route.forEach((d) => {
-                    const row = [];
                     row.push(d.from);
                     row.push(d.to);
                     row.push(d.price);
@@ -64,12 +70,11 @@ module.exports = {
                     results.push(row.join());
                 });
 
-                console.log(results)
-
                 fs.writeFileSync(filename, results.join(os.EOL));
 
+                expect(expected).toStrictEqual(results)
             })
+    }); 
 
-        res.json(route)
-    }
-}
+    */
+})
